@@ -1,0 +1,16 @@
+{
+    "ingredients": [
+        {
+            "id": 0,
+            "name": "lentil500g",
+            "recipes": [0]
+        }
+    ],
+    "recipes": [
+        {
+            "id": 0,
+            "name": "curry",
+            "ingredients": [0]
+        }
+    ]
+}
