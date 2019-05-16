@@ -1,16 +1,33 @@
 {
-    "ingredients": [
+    "items": [
         {
             "id": 0,
-            "name": "lentil500g",
+            "name": "Red lentils",
+            "size": 500,
+            "measure": "grams",
+            "stock": 2,
+            "cost": 4,
+            "recipes": [0]
+        },
+        {
+            "id": 1,
+            "name": "Pumpkin",
+            "size": 0.5,
+            "measure": "pumpkins",
+            "stock": 1,
+            "cost": 3,
             "recipes": [0]
         }
     ],
     "recipes": [
         {
             "id": 0,
-            "name": "curry",
-            "ingredients": [0]
+            "name": "Classico curry",
+            "serves": 6,
+            "ingredients": [
+                { "id": 0, "quantity": 250 },
+                { "id": 1, "quantity": 1 }
+            ]
         }
     ]
 }

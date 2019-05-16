@@ -1,8 +1,47 @@
 import React from "react";
+import { Table, Button, Icon } from "antd";
+
+const columns = [
+    {
+        title: "Recipe",
+        dataIndex: "recipe",
+        key: "recipe"
+    },
+    {
+        title: "Serves",
+        dataIndex: "serves",
+        key: "serves"
+    },
+    {
+        title: "Ingredients",
+        dataIndex: "ingredients",
+        key: "ingredients"
+    },
+    {
+        title: "Cost",
+        dataIndex: "cost",
+        key: "cost"
+    },
+    {
+        title: "Savings",
+        dataIndex: "savings",
+        key: "savings"
+    },
+    {
+        title: "Action",
+        dataIndex: "action",
+        key: "action"
+    }
+];
 
 class RecipeBook extends React.Component<any, any> {
     render() {
-        return <React.Fragment>ello, I'm a recipe book</React.Fragment>;
+        return (
+            <React.Fragment>
+                <Button>Add recipe</Button>
+                <Table columns={columns} />
+            </React.Fragment>
+        );
     }
 }
 

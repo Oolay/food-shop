@@ -1,22 +1,18 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import styles from "./App.module.css";
 
 import Pantry from "./views/Pantry";
 import RecipeBook from "./views/RecipeBook";
 import ShoppingList from "./views/ShoppingList";
 import NavBar from "./components/NavBar";
+import { Layout } from "antd";
+import SideBar from "./components/SideBar";
+
+const { Content } = Layout;
 
 class App extends React.Component<any, any> {
-    state = {
+    state: any = {
         view: "shoppingList"
-    };
-
-    getView = () => {
-        if (this.state.view === "pantry") {
-            return <Pantry />;
-        } else if (this.state.view === "recipeBook") {
-            return <RecipeBook />;
-        } else if (this.state.view === "shoppingList") return <ShoppingList />;
     };
 
     handleShoppingListClick = () => {
@@ -37,9 +33,19 @@ class App extends React.Component<any, any> {
         });
     };
 
+    getContent = (view: string): ReactElement | undefined => {
+        if (view === "shoppingList") {
+            return <ShoppingList />;
+        } else if (view === "recipeBook") {
+            return <RecipeBook />;
+        } else if (view === "pantry") {
+            return <Pantry />;
+        }
+    };
+
     render() {
         return (
-            <React.Fragment>
+            <Layout>
                 <NavBar
                     handleShoppingListClick={this.handleShoppingListClick.bind(
                         this
@@ -49,8 +55,10 @@ class App extends React.Component<any, any> {
                         this
                     )}
                 />
-                <div className={styles.viewContainer}>{this.getView()}</div>
-            </React.Fragment>
+                <Layout>
+                    <Content>{this.getContent(this.state.view)}</Content>
+                </Layout>
+            </Layout>
         );
     }
 }
