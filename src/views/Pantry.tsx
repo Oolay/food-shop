@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Divider, Tag, Button } from "antd";
+import { Table, Button } from "antd";
 
 const columns = [
     {
@@ -34,7 +34,7 @@ const columns = [
     }
 ];
 
-class Pantry extends React.Component<any, any> {
+class Pantry extends React.Component<{}> {
     render() {
         return (
             <React.Fragment>

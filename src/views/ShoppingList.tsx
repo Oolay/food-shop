@@ -29,7 +29,7 @@ const columns = [
     }
 ];
 
-class ShoppingList extends React.Component<any, any> {
+class ShoppingList extends React.Component<{}> {
     render() {
         return (
             <React.Fragment>

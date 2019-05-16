@@ -6,7 +6,9 @@ import styles from "./styles/NavBar.module.css";
 
 const { Header } = Layout;
 
-class NavBar extends React.Component<any, any> {
+class NavBar extends React.Component<{
+    handleMenuClick(view: "shoppingList" | "recipeBook" | "pantry"): () => void;
+}> {
     render() {
         return (
             <Header>
@@ -18,19 +20,19 @@ class NavBar extends React.Component<any, any> {
                 >
                     <Menu.Item
                         key="shoppingList"
-                        onClick={this.props.handleShoppingListClick}
+                        onClick={this.props.handleMenuClick("shoppingList")}
                     >
                         Shopping lists
                     </Menu.Item>
                     <Menu.Item
                         key="recipeBook"
-                        onClick={this.props.handleRecipeBookClick}
+                        onClick={this.props.handleMenuClick("recipeBook")}
                     >
                         Recipe book
                     </Menu.Item>
                     <Menu.Item
                         key="pantry"
-                        onClick={this.props.handlePantryClick}
+                        onClick={this.props.handleMenuClick("pantry")}
                     >
                         Pantry
                     </Menu.Item>

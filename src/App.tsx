@@ -9,30 +9,24 @@ import { Layout } from "antd";
 
 const { Content } = Layout;
 
-class App extends React.Component<any, any> {
-    state: any = {
+interface State {
+    view: "shoppingList" | "recipeBook" | "pantry";
+}
+
+class App extends React.Component<{}, State> {
+    public state: State = {
         view: "shoppingList"
     };
 
-    handleShoppingListClick = () => {
+    public handleMenuClick = (
+        view: "shoppingList" | "recipeBook" | "pantry"
+    ) => () => {
         this.setState({
-            view: "shoppingList"
+            view
         });
     };
 
-    handlePantryClick = () => {
-        this.setState({
-            view: "pantry"
-        });
-    };
-
-    handleRecipeBookClick = () => {
-        this.setState({
-            view: "recipeBook"
-        });
-    };
-
-    getContent = (view: string): ReactElement | undefined => {
+    public getContent = (view: string) => {
         if (view === "shoppingList") {
             return <ShoppingList />;
         } else if (view === "recipeBook") {
@@ -40,20 +34,14 @@ class App extends React.Component<any, any> {
         } else if (view === "pantry") {
             return <Pantry />;
         }
+
+        return null;
     };
 
     render() {
         return (
             <Layout>
-                <NavBar
-                    handleShoppingListClick={this.handleShoppingListClick.bind(
-                        this
-                    )}
-                    handlePantryClick={this.handlePantryClick.bind(this)}
-                    handleRecipeBookClick={this.handleRecipeBookClick.bind(
-                        this
-                    )}
-                />
+                <NavBar handleMenuClick={this.handleMenuClick} />
                 <Layout>
                     <Content>{this.getContent(this.state.view)}</Content>
                 </Layout>
