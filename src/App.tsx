@@ -1,56 +1,51 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import styles from "./App.module.css";
 
 import Pantry from "./views/Pantry";
 import RecipeBook from "./views/RecipeBook";
 import ShoppingList from "./views/ShoppingList";
 import NavBar from "./components/NavBar";
+import { Layout } from "antd";
 
-class App extends React.Component<any, any> {
-    state = {
+const { Content } = Layout;
+
+interface State {
+    view: "shoppingList" | "recipeBook" | "pantry";
+}
+
+class App extends React.Component<{}, State> {
+    public state: State = {
         view: "shoppingList"
     };
 
-    getView = () => {
-        if (this.state.view === "pantry") {
-            return <Pantry />;
-        } else if (this.state.view === "recipeBook") {
+    public handleMenuClick = (
+        view: "shoppingList" | "recipeBook" | "pantry"
+    ) => () => {
+        this.setState({
+            view
+        });
+    };
+
+    public getContent = (view: string) => {
+        if (view === "shoppingList") {
+            return <ShoppingList />;
+        } else if (view === "recipeBook") {
             return <RecipeBook />;
-        } else if (this.state.view === "shoppingList") return <ShoppingList />;
-    };
+        } else if (view === "pantry") {
+            return <Pantry />;
+        }
 
-    handleShoppingListClick = () => {
-        this.setState({
-            view: "shoppingList"
-        });
-    };
-
-    handlePantryClick = () => {
-        this.setState({
-            view: "pantry"
-        });
-    };
-
-    handleRecipeBookClick = () => {
-        this.setState({
-            view: "recipeBook"
-        });
+        return null;
     };
 
     render() {
         return (
-            <React.Fragment>
-                <NavBar
-                    handleShoppingListClick={this.handleShoppingListClick.bind(
-                        this
-                    )}
-                    handlePantryClick={this.handlePantryClick.bind(this)}
-                    handleRecipeBookClick={this.handleRecipeBookClick.bind(
-                        this
-                    )}
-                />
-                <div className={styles.viewContainer}>{this.getView()}</div>
-            </React.Fragment>
+            <Layout>
+                <NavBar handleMenuClick={this.handleMenuClick} />
+                <Layout>
+                    <Content>{this.getContent(this.state.view)}</Content>
+                </Layout>
+            </Layout>
         );
     }
 }

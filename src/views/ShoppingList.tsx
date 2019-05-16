@@ -1,8 +1,42 @@
 import React from "react";
+import { Table, Button } from "antd";
 
-class ShoppingList extends React.Component {
+const columns = [
+    {
+        title: "Date",
+        dataIndex: "date",
+        key: "date"
+    },
+    {
+        title: "Items",
+        dataIndex: "items",
+        key: "items"
+    },
+    {
+        title: "Cost",
+        dataIndex: "cost",
+        key: "cost"
+    },
+    {
+        title: "Savings",
+        dataIndex: "savings",
+        key: "savings"
+    },
+    {
+        title: "Action",
+        dataIndex: "action",
+        key: "action"
+    }
+];
+
+class ShoppingList extends React.Component<{}> {
     render() {
-        return <React.Fragment>ello, I'm a shopping list</React.Fragment>;
+        return (
+            <React.Fragment>
+                <Button>Add shopping list</Button>
+                <Table columns={columns} />;
+            </React.Fragment>
+        );
     }
 }
 
