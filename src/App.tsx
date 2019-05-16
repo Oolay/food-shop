@@ -6,7 +6,6 @@ import RecipeBook from "./views/RecipeBook";
 import ShoppingList from "./views/ShoppingList";
 import NavBar from "./components/NavBar";
 import { Layout } from "antd";
-import SideBar from "./components/SideBar";
 
 const { Content } = Layout;
 
