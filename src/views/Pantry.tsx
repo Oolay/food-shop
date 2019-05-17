@@ -1,11 +1,22 @@
 import React from "react";
 import { Table, Button } from "antd";
 
+type item = {
+    id: number;
+    name: string;
+    size: number;
+    measure: string;
+    stock: number;
+    cost: number;
+    recipes: number[];
+};
+
+const itemDataURL = "http://localhost:3000/items";
 const columns = [
     {
-        title: "Item",
-        dataIndex: "item",
-        key: "item"
+        title: "Name",
+        dataIndex: "name",
+        key: "name"
     },
     {
         title: "Size",
@@ -34,12 +45,32 @@ const columns = [
     }
 ];
 
-class Pantry extends React.Component<{}> {
+class Pantry extends React.Component<{}, { tableData: item[] }> {
+    public async componentDidMount() {
+        const itemDataResponse = await fetch(itemDataURL);
+        const itemData = await itemDataResponse.json();
+        const tableData = await itemData.map((item: item, indx: number) => {
+            return { ...item, key: indx };
+        });
+        this.setState({
+            tableData: tableData
+        });
+    }
+
+    public getTableDisplay = () => {
+        if (this.state) {
+            return (
+                <Table columns={columns} dataSource={this.state.tableData} />
+            );
+        }
+
+        return <div>Data loading</div>;
+    };
     render() {
         return (
             <React.Fragment>
                 <Button>Add item</Button>
-                <Table columns={columns} />
+                {this.getTableDisplay()}
             </React.Fragment>
         );
     }
