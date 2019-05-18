@@ -1,8 +1,7 @@
 import React from "react";
-import { Layout, Menu, Breadcrumb, Icon } from "antd";
+import Layout from "antd/lib/layout";
+import Menu from "antd/lib/menu";
 import "antd/dist/antd.css";
-
-import styles from "./styles/NavBar.module.css";
 
 const { Header } = Layout;
 

@@ -1,45 +1,102 @@
 import React from "react";
-import { Table, Button } from "antd";
+import Table, { TableProps } from "antd/lib/table";
+import Button from "antd/lib/button";
+import Spin from "antd/lib/spin";
 
-const columns = [
-    {
-        title: "Recipe",
-        dataIndex: "recipe",
-        key: "recipe"
-    },
-    {
-        title: "Serves",
-        dataIndex: "serves",
-        key: "serves"
-    },
-    {
-        title: "Ingredients",
-        dataIndex: "ingredients",
-        key: "ingredients"
-    },
-    {
-        title: "Cost",
-        dataIndex: "cost",
-        key: "cost"
-    },
-    {
-        title: "Savings",
-        dataIndex: "savings",
-        key: "savings"
-    },
-    {
-        title: "Action",
-        dataIndex: "action",
-        key: "action"
+type Recipe = {
+    id: number;
+    name: string;
+    serves: number;
+    ingredients: number[];
+};
+
+const recipeDataURL = "http://localhost:3000/recipes";
+
+interface State {
+    tableData: Recipe[];
+    loading: boolean;
+}
+class RecipeBook extends React.Component<{}, State> {
+    private columns: TableProps<Recipe>["columns"];
+    constructor(props: {}) {
+        super(props);
+        this.state = {
+            tableData: [],
+            loading: true
+        };
+
+        this.columns = [
+            {
+                title: "Name",
+                dataIndex: "name",
+                key: "name"
+            },
+            {
+                title: "Serves",
+                dataIndex: "serves",
+                key: "serves"
+            },
+            {
+                title: "Ingredients",
+                dataIndex: "ingredients",
+                key: "ingredients",
+                render: (text: string, record: Recipe) => {
+                    return <Button>{`${record.name}'s  ingredients`}</Button>;
+                }
+            },
+            {
+                title: "Cost",
+                dataIndex: "cost",
+                key: "cost"
+            },
+            {
+                title: "Savings",
+                dataIndex: "savings",
+                key: "savings"
+            },
+            {
+                title: "Action",
+                dataIndex: "action",
+                key: "action"
+            }
+        ];
     }
-];
 
-class RecipeBook extends React.Component<{}> {
+    public async componentDidMount() {
+        const recipeDataResponse = await fetch(recipeDataURL);
+        const recipeData = await recipeDataResponse.json();
+        const tableData = recipeData.map((recipe: Recipe) => {
+            return { ...recipe, key: recipe.id };
+        });
+
+        this.setState({
+            tableData,
+            loading: false
+        });
+    }
+
+    public getTableDisplay = () => {
+        if (!this.state.loading) {
+            return (
+                <Table
+                    columns={this.columns}
+                    dataSource={this.state.tableData}
+                />
+            );
+        }
+
+        return <Spin size="large" />;
+    };
+
+    public handleViewIngredientsClick = () => {
+        console.log("ello");
+    };
+
     render() {
         return (
             <React.Fragment>
                 <Button>Add recipe</Button>
-                <Table columns={columns} />
+                {this.getTableDisplay()}
             </React.Fragment>
         );
     }
