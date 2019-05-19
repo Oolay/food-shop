@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "antd/lib/layout";
 import Menu from "antd/lib/menu";
-import withStyles from "react-jss";
+import withStyles, { WithSheet } from "react-jss";
 import "antd/dist/antd.css";
 
 import foodShopLogo from "../foodShopLogo2.png";
@@ -17,10 +17,13 @@ const styles = {
     }
 };
 
-class NavBar extends React.Component<{
-    classes: any;
-    handleMenuClick(view: "shoppingList" | "recipeBook" | "pantry"): () => void;
-}> {
+export interface Props extends WithSheet<typeof styles, {}> {
+    handleMenuClick: (
+        view: "shoppingList" | "recipeBook" | "pantry"
+    ) => () => void;
+}
+
+class NavBar extends React.Component<Props> {
     render() {
         const { classes } = this.props;
 
