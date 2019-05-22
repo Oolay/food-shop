@@ -16,6 +16,7 @@ interface State {
     tableData: Recipe[];
     loading: boolean;
 }
+
 class RecipeBook extends React.Component<{}, State> {
     private columns: TableProps<Recipe>["columns"];
     constructor(props: {}) {
@@ -62,12 +63,18 @@ class RecipeBook extends React.Component<{}, State> {
         ];
     }
 
-    public async componentDidMount() {
-        const recipeDataResponse = await fetch(recipeDataURL);
+    public fetchTableData = async (url: string) => {
+        const recipeDataResponse = await fetch(url);
         const recipeData = await recipeDataResponse.json();
         const tableData = recipeData.map((recipe: Recipe) => {
             return { ...recipe, key: recipe.id };
         });
+
+        return tableData;
+    };
+
+    public async componentDidMount() {
+        const tableData = await this.fetchTableData(recipeDataURL);
 
         this.setState({
             tableData,
