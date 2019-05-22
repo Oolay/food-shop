@@ -2,15 +2,17 @@ import React from "react";
 import Table, { TableProps } from "antd/lib/table";
 import Button from "antd/lib/button";
 import Spin from "antd/lib/spin";
+import AddItemForm from "../components/AddItemForm";
+import Input from "antd/lib/input";
 
 type Item = {
     id: number;
     name: string;
     size: number;
     measure: string;
-    stock: number;
-    cost: number;
-    recipes: number[];
+    count?: number;
+    cost?: number;
+    recipes?: number[];
 };
 
 const itemDataURL = "http://localhost:3000/items";
@@ -18,15 +20,18 @@ const itemDataURL = "http://localhost:3000/items";
 interface State {
     tableData: Item[];
     loading: boolean;
+    formVisible: boolean;
 }
 
 class Pantry extends React.Component<{}, State> {
     private columns: TableProps<Item>["columns"];
+    private formRef: Input | undefined | null;
     constructor(props: {}) {
         super(props);
         this.state = {
             tableData: [],
-            loading: true
+            loading: true,
+            formVisible: false
         };
         this.columns = [
             {
@@ -46,8 +51,8 @@ class Pantry extends React.Component<{}, State> {
             },
             {
                 title: "Stock",
-                dataIndex: "stock",
-                key: "stock"
+                dataIndex: "count",
+                key: "count"
             },
             {
                 title: "Recipes",
@@ -65,25 +70,94 @@ class Pantry extends React.Component<{}, State> {
         ];
     }
 
-    public async componentDidMount() {
-        const itemDataResponse = await fetch(itemDataURL);
+    public fetchTableData = async (url: string) => {
+        const itemDataResponse = await fetch(url);
         const itemData = await itemDataResponse.json();
         const tableData = itemData.map((item: Item) => {
+            if (item.measure === "whole") {
+                item.measure = item.name.toLowerCase() + "s";
+            }
             return { ...item, key: item.id };
         });
+
         this.setState({
-            tableData: tableData,
+            tableData
+        });
+    };
+
+    public postItemData = async (url: string, data: Item) => {
+        await fetch(url, {
+            method: "post",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    };
+
+    public async componentDidMount() {
+        await this.fetchTableData(itemDataURL);
+        this.setState({
             loading: false
         });
     }
 
+    public handleAddItemClick = () => {
+        this.setState({
+            formVisible: true
+        });
+    };
+
+    public handleFormCancel = () => {
+        this.setState({
+            formVisible: false
+        });
+    };
+
+    public checkMatch = (newItem: Item) => {
+        const matchedItem: Item | undefined = this.state.tableData.find(
+            (item: Item) =>
+                newItem.name === item.name && newItem.size === item.size
+        );
+
+        return { match: matchedItem ? true : false, item: matchedItem };
+    };
+
+    public handleFormAddItem = async () => {
+        this.setState({
+            loading: true
+        });
+        if (this.formRef) {
+            const form: any = this.formRef.props.form;
+            form.validateFields(async (err: {}, item: Item) => {
+                if (err) {
+                    return;
+                }
+                await this.postItemData(itemDataURL, item);
+                await this.fetchTableData(itemDataURL);
+                form.resetFields();
+                this.setState({
+                    loading: false,
+                    formVisible: false
+                });
+            });
+        }
+    };
+
+    public saveFormRef = (formRef: Input | null) => {
+        this.formRef = formRef;
+    };
+
     public getTableDisplay = () => {
         if (!this.state.loading) {
             return (
-                <Table
-                    columns={this.columns}
-                    dataSource={this.state.tableData}
-                />
+                <React.Fragment>
+                    <Button onClick={this.handleAddItemClick}>Add item</Button>
+                    <Table
+                        columns={this.columns}
+                        dataSource={this.state.tableData}
+                    />
+                </React.Fragment>
             );
         }
 
@@ -93,8 +167,13 @@ class Pantry extends React.Component<{}, State> {
     render() {
         return (
             <React.Fragment>
-                <Button>Add item</Button>
                 {this.getTableDisplay()}
+                <AddItemForm
+                    visible={this.state.formVisible}
+                    onCancel={this.handleFormCancel}
+                    onAddItem={this.handleFormAddItem}
+                    wrappedComponentRef={this.saveFormRef}
+                />
             </React.Fragment>
         );
     }
