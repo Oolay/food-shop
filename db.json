@@ -51,21 +51,24 @@
       "id": 5
     }
   ],
-  "recipes": [
-    {
-      "id": 0,
-      "name": "Classico curry",
-      "serves": 6,
-      "ingredients": [
+  
+    "recipes": [
         {
-          "id": 0,
-          "quantity": 250
-        },
-        {
-          "id": 1,
-          "quantity": 1
+            "id": 0,
+            "name": "Classico curry",
+            "serves": 6,
+            "ingredients": [
+                { "id": 0, "quantity": 250 },
+                { "id": 1, "quantity": 1 }
+            ]
         }
-      ]
-    }
-  ]
+    ],
+    "shoppingLists": [
+        {
+            "id": 0,
+            "date": "20/05/2019",
+            "items": [{ "id": 0, "count": 3 }, { "id": 1, "count": 2 }]
+        }
+    ]
 }
+

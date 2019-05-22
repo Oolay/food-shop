@@ -1,42 +1,99 @@
 import React from "react";
-import { Table, Button } from "antd";
+import Table, { TableProps } from "antd/lib/table";
+import Button from "antd/lib/button";
+import Spin from "antd/lib/spin";
 
-const columns = [
-    {
-        title: "Date",
-        dataIndex: "date",
-        key: "date"
-    },
-    {
-        title: "Items",
-        dataIndex: "items",
-        key: "items"
-    },
-    {
-        title: "Cost",
-        dataIndex: "cost",
-        key: "cost"
-    },
-    {
-        title: "Savings",
-        dataIndex: "savings",
-        key: "savings"
-    },
-    {
-        title: "Action",
-        dataIndex: "action",
-        key: "action"
+type ItemList = {
+    id: string;
+    date: string;
+    items: { id: number; count: number }[];
+};
+
+const shoppingListDataURL = "http://localhost:3000/shoppingLists";
+
+interface State {
+    tableData: ItemList[];
+    loading: boolean;
+}
+
+class ShoppingList extends React.Component<{}, State> {
+    private columns: TableProps<ItemList>["columns"];
+    constructor(props: {}) {
+        super(props);
+        this.state = {
+            tableData: [],
+            loading: true
+        };
+
+        this.columns = [
+            {
+                title: "Date",
+                dataIndex: "date",
+                key: "date"
+            },
+            {
+                title: "Items",
+                dataIndex: "items",
+                key: "items",
+                render: (text: string, record: ItemList) => {
+                    return <Button>{`view items`}</Button>;
+                }
+            },
+            {
+                title: "Cost",
+                dataIndex: "cost",
+                key: "cost"
+            },
+            {
+                title: "Savings",
+                dataIndex: "savings",
+                key: "savings"
+            },
+            {
+                title: "Action",
+                dataIndex: "action",
+                key: "action"
+            }
+        ];
     }
-];
 
-class ShoppingList extends React.Component<{}> {
+    fetchTableData = async (URL: string) => {
+        const shoppingListDataResponse = await fetch(URL);
+        const shoppingListData = await shoppingListDataResponse.json();
+        const tableData = shoppingListData.map((shoppingList: ItemList) => {
+            return { ...shoppingList, key: shoppingList.id };
+        });
+
+        return tableData;
+    };
+
+    async componentDidMount() {
+        const tableData = await this.fetchTableData(shoppingListDataURL);
+
+        this.setState({
+            tableData,
+            loading: false
+        });
+    }
+
+    getTableDisplay = () => {
+        if (!this.state.loading) {
+            return (
+                <React.Fragment>
+                    <Button>Add shopping list</Button>
+                    <Table
+                        columns={this.columns}
+                        dataSource={this.state.tableData}
+                    />
+                    ;
+                </React.Fragment>
+            );
+        }
+
+        return <Spin size="large" />;
+    };
     render() {
-        return (
-            <React.Fragment>
-                <Button>Add shopping list</Button>
-                <Table columns={columns} />;
-            </React.Fragment>
-        );
+        return this.getTableDisplay();
     }
 }
 
