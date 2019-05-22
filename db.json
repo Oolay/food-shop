@@ -29,5 +29,12 @@
                 { "id": 1, "quantity": 1 }
             ]
         }
+    ],
+    "shoppingLists": [
+        {
+            "id": 0,
+            "date": "20/05/2019",
+            "items": [{ "id": 0, "count": 3 }, { "id": 1, "count": 2 }]
+        }
     ]
 }
