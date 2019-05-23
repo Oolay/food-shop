@@ -47,13 +47,12 @@ class AddItemForm extends React.Component<Props> {
                         })(<InputNumber min={0} />)}
                     </Form.Item>
 
-                    <Form.Item label="Measure">
-                        {getFieldDecorator("measure", {
+                    <Form.Item label="Units">
+                        {getFieldDecorator("unit", {
                             rules: [
                                 {
                                     required: true,
-                                    message:
-                                        "Please imput the measure of the size"
+                                    message: "Please imput the unit of the size"
                                 }
                             ]
                         })(
