@@ -9,8 +9,6 @@ type ItemList = {
     items: { id: number; count: number }[];
 };
 
-const shoppingListDataURL = "http://localhost:3000/shoppingLists";
-
 interface State {
     tableData: ItemList[];
     loading: boolean;
@@ -57,21 +55,8 @@ class ShoppingList extends React.Component<{}, State> {
         ];
     }
 
-    fetchTableData = async (URL: string) => {
-        const shoppingListDataResponse = await fetch(URL);
-        const shoppingListData = await shoppingListDataResponse.json();
-        const tableData = shoppingListData.map((shoppingList: ItemList) => {
-            return { ...shoppingList, key: shoppingList.id };
-        });
-
-        return tableData;
-    };
-
     async componentDidMount() {
-        const tableData = await this.fetchTableData(shoppingListDataURL);
-
         this.setState({
-            tableData,
             loading: false
         });
     }

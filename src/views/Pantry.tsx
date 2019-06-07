@@ -5,31 +5,27 @@ import Spin from "antd/lib/spin";
 import AddItemForm from "../components/AddItemForm";
 import Input from "antd/lib/input";
 
+const pantryDataUrl = "http://localhost:3003/pantry";
+
 type Item = {
-    id?: number;
-    name: string;
-    size: number;
-    unit: string;
+    itemId?: number;
+    itemName: string;
+    itemSize: number;
+    itemUnit: string;
 };
 
 type PantryItem = {
     id?: number;
     itemId: number;
-    stock: number;
+    itemStock: number;
 };
 
-type ItemFormData = {
+type PantryItemFromForm = {
     name: string;
     size: number;
     unit: string;
     count: number;
 };
-
-type PantryDataUrl = "http://localhost:3000/pantry";
-type ItemDataUrl = "http://localhost:3000/items";
-
-const pantryDataUrl: PantryDataUrl = "http://localhost:3000/pantry";
-const itemDataUrl: ItemDataUrl = "http://localhost:3000/items";
 
 interface State {
     tableData: Item[];
@@ -50,30 +46,30 @@ class Pantry extends React.Component<{}, State> {
         this.columns = [
             {
                 title: "Name",
-                dataIndex: "name",
-                key: "name"
+                dataIndex: "itemName",
+                key: "itemName"
             },
             {
                 title: "Size",
-                dataIndex: "size",
-                key: "size"
+                dataIndex: "itemSize",
+                key: "itemSize"
             },
             {
                 title: "Unit",
-                dataIndex: "unit",
-                key: "unit"
+                dataIndex: "itemUnit",
+                key: "itemUnit"
             },
             {
                 title: "Stock",
-                dataIndex: "stock",
-                key: "stock"
+                dataIndex: "itemStock",
+                key: "itemStock"
             },
             {
                 title: "Recipes",
                 dataIndex: "recipes",
                 key: "recipes",
                 render: (text: string, record: Item) => {
-                    return <Button>{`recipes with ${record.name}`}</Button>;
+                    return <Button>{`recipes with ${record.itemName}`}</Button>;
                 }
             },
             {
@@ -85,48 +81,22 @@ class Pantry extends React.Component<{}, State> {
     }
 
     public fetchTableData = async () => {
-        const itemDataResponse = await fetch(itemDataUrl);
-        const itemData = await itemDataResponse.json();
         const pantryDataResponse = await fetch(pantryDataUrl);
         const pantryData = await pantryDataResponse.json();
-
-        const tableData = pantryData.map((pantryItem: PantryItem) => {
-            const item = itemData.find(
-                (item: Item) => pantryItem.itemId === item.id
-            );
-
-            if (item.unit === "whole") {
-                if (item.name.slice(-1) === "s") {
-                    item.unit = item.name.toLowerCase();
-                } else {
-                    item.unit = item.name.toLowerCase() + "s";
-                }
+        const tableData = pantryData.map((pantryItem: Item) => {
+            if (pantryItem.itemUnit === "whole") {
+                pantryItem.itemUnit = pantryItem.itemName + "s";
             }
-            return { ...item, key: item.id, stock: pantryItem.stock };
+            return { ...pantryItem, key: pantryItem.itemId };
         });
-
-        this.setState({
-            tableData
-        });
-    };
-
-    public postItemData = async (
-        url: ItemDataUrl | PantryDataUrl,
-        data: Item | PantryItem
-    ) => {
-        await fetch(url, {
-            method: "post",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+        return tableData;
     };
 
     public async componentDidMount() {
-        await this.fetchTableData();
+        const tableData = await this.fetchTableData();
         this.setState({
-            loading: false
+            loading: false,
+            tableData
         });
     }
 
@@ -142,28 +112,6 @@ class Pantry extends React.Component<{}, State> {
         });
     };
 
-    public checkMatch = (newItem: Item) => {
-        const matchedItem: Item | undefined = this.state.tableData.find(
-            (item: Item) =>
-                newItem.name === item.name && newItem.size === item.size
-        );
-
-        return { match: matchedItem ? true : false, item: matchedItem };
-    };
-
-    public fetchItemId = async (itemFormData: ItemFormData) => {
-        const itemDataResponse = await fetch(itemDataUrl);
-        const itemData = await itemDataResponse.json();
-
-        const item = itemData.find(
-            (item: Item) =>
-                itemFormData.name === item.name &&
-                itemFormData.size === item.size
-        );
-
-        return item.id;
-    };
-
     public handleFormAddItem = async () => {
         this.setState({
             loading: true
@@ -171,24 +119,24 @@ class Pantry extends React.Component<{}, State> {
         if (this.formRef) {
             const form: any = this.formRef.props.form;
             form.validateFields(
-                async (err: {}, newItemFromForm: ItemFormData) => {
+                async (err: {}, newPantryItemFromForm: PantryItemFromForm) => {
                     if (err) {
                         return;
                     }
-                    const newItemData = {
-                        name: newItemFromForm.name,
-                        size: newItemFromForm.size,
-                        unit: newItemFromForm.unit
+                    const newPantryItem = {
+                        itemName: newPantryItemFromForm.name,
+                        itemSize: newPantryItemFromForm.size,
+                        itemUnit: newPantryItemFromForm.unit,
+                        pantryCount: newPantryItemFromForm.count
                     };
 
-                    await this.postItemData(itemDataUrl, newItemData);
-                    const newItemId = await this.fetchItemId(newItemFromForm);
-                    const newPantyItem = {
-                        itemId: newItemId,
-                        stock: newItemFromForm.count
-                    };
-                    await this.postItemData(pantryDataUrl, newPantyItem);
-
+                    await fetch(pantryDataUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(newPantryItem)
+                    });
                     await this.fetchTableData();
                     form.resetFields();
                     this.setState({
