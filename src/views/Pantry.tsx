@@ -137,11 +137,15 @@ class Pantry extends React.Component<{}, State> {
                         },
                         body: JSON.stringify(newPantryItem)
                     });
-                    await this.fetchTableData();
+
+                    const newTableData = await this.fetchTableData();
+
                     form.resetFields();
+
                     this.setState({
                         loading: false,
-                        formVisible: false
+                        formVisible: false,
+                        tableData: newTableData
                     });
                 }
             );
