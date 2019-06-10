@@ -4,11 +4,9 @@ import Button from "antd/lib/button";
 import Spin from "antd/lib/spin";
 import AddItemForm from "../components/AddItemForm";
 import Input from "antd/lib/input";
-import tableUtils from "../utils/table.utils";
+import tableApiMethods from "../utils/tableApi";
 
-const pantryUrl = "http://localhost:3003/pantry";
-
-const pantryTableUtils = tableUtils(pantryUrl);
+const pantryTableUtils = tableApiMethods("pantry");
 
 type ItemRow = {
     itemId: number;
@@ -130,7 +128,7 @@ class Pantry extends React.Component<{}, State> {
                         pantryCount: newPantryItemFromForm.count
                     };
 
-                    await pantryTableUtils.postTableEntry(newPantryItem);
+                    await pantryTableUtils.createTableEntry(newPantryItem);
 
                     const tableData = await pantryTableUtils.fetchTableData();
 

@@ -17,10 +17,10 @@ const styles = {
     }
 };
 
+type View = "shoppingList" | "recipeBook" | "pantry";
+
 export interface Props extends WithSheet<typeof styles, {}> {
-    handleMenuClick: (
-        view: "shoppingList" | "recipeBook" | "pantry"
-    ) => () => void;
+    handleMenuClick: (view: View) => () => void;
 }
 
 class NavBar extends React.Component<Props> {
