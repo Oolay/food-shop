@@ -1,9 +1,9 @@
 import React, { ReactElement } from "react";
 import styles from "./App.module.css";
 
-import Pantry from "./views/Pantry";
-import RecipeBook from "./views/RecipeBook";
-import ShoppingList from "./views/ShoppingList";
+import Pantry from "./pantry/Pantry";
+import RecipeBook from "./recipe_book/RecipeBook";
+import ShoppingList from "./shopping_list/ShoppingList";
 import NavBar from "./components/NavBar";
 import { Layout } from "antd";
 

@@ -4,20 +4,18 @@ import Button from "antd/lib/button";
 import Spin from "antd/lib/spin";
 import AddItemForm from "../components/AddItemForm";
 import Input from "antd/lib/input";
+import tableUtils from "../utils/table.utils";
 
-const pantryDataUrl = "http://localhost:3003/pantry";
+const pantryUrl = "http://localhost:3003/pantry";
 
-type Item = {
-    itemId?: number;
+const pantryTableUtils = tableUtils(pantryUrl);
+
+type ItemRow = {
+    itemId: number;
     itemName: string;
     itemSize: number;
     itemUnit: string;
-};
-
-type PantryItem = {
-    id?: number;
-    itemId: number;
-    itemStock: number;
+    pantryCount: number;
 };
 
 type PantryItemFromForm = {
@@ -28,13 +26,13 @@ type PantryItemFromForm = {
 };
 
 interface State {
-    tableData: Item[];
+    tableData: ItemRow[];
     loading: boolean;
     formVisible: boolean;
 }
 
 class Pantry extends React.Component<{}, State> {
-    private columns: TableProps<Item>["columns"];
+    private columns: TableProps<ItemRow>["columns"];
     private formRef: Input | undefined | null;
     constructor(props: {}) {
         super(props);
@@ -61,44 +59,46 @@ class Pantry extends React.Component<{}, State> {
             },
             {
                 title: "Stock",
-                dataIndex: "itemStock",
-                key: "itemStock"
+                dataIndex: "pantryCount",
+                key: "pantryCount"
             },
             {
                 title: "Recipes",
                 dataIndex: "recipes",
                 key: "recipes",
-                render: (text: string, record: Item) => {
-                    return <Button>{`recipes with ${record.itemName}`}</Button>;
+                render: (text: string, entry: ItemRow) => {
+                    return <Button>{`recipes with ${entry.itemName}`}</Button>;
                 }
             },
             {
                 title: "Action",
                 dataIndex: "action",
-                key: "action"
+                key: "action",
+                render: (text: string, entry: ItemRow) => {
+                    return (
+                        <a onClick={this.handleDeleteClick(entry)}>Remove</a>
+                    );
+                }
             }
         ];
     }
 
-    public fetchTableData = async () => {
-        const pantryDataResponse = await fetch(pantryDataUrl);
-        const pantryData = await pantryDataResponse.json();
-        const tableData = pantryData.map((pantryItem: Item) => {
-            if (pantryItem.itemUnit === "whole") {
-                pantryItem.itemUnit = pantryItem.itemName + "s";
-            }
-            return { ...pantryItem, key: pantryItem.itemId };
-        });
-        return tableData;
-    };
-
     public async componentDidMount() {
-        const tableData = await this.fetchTableData();
+        const tableData = await pantryTableUtils.fetchTableData();
         this.setState({
             loading: false,
             tableData
         });
     }
+
+    public handleDeleteClick = (entry: ItemRow) => async () => {
+        await pantryTableUtils.deleteTableEntry(entry)();
+        const tableData = await pantryTableUtils.fetchTableData();
+
+        this.setState({
+            tableData
+        });
+    };
 
     public handleAddItemClick = () => {
         this.setState({
@@ -130,22 +130,16 @@ class Pantry extends React.Component<{}, State> {
                         pantryCount: newPantryItemFromForm.count
                     };
 
-                    await fetch(pantryDataUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(newPantryItem)
-                    });
+                    await pantryTableUtils.postTableEntry(newPantryItem);
 
-                    const newTableData = await this.fetchTableData();
+                    const tableData = await pantryTableUtils.fetchTableData();
 
                     form.resetFields();
 
                     this.setState({
                         loading: false,
                         formVisible: false,
-                        tableData: newTableData
+                        tableData
                     });
                 }
             );

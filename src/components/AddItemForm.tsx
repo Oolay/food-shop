@@ -61,9 +61,7 @@ class AddItemForm extends React.Component<Props> {
                                 <Select.Option value="kg">kg</Select.Option>
                                 <Select.Option value="ml">ml</Select.Option>
                                 <Select.Option value="L">L</Select.Option>
-                                <Select.Option value="whole">
-                                    whole
-                                </Select.Option>
+                                <Select.Option value="-">-</Select.Option>
                             </Select>
                         )}
                     </Form.Item>
