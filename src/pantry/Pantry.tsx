@@ -2,11 +2,12 @@ import React from "react";
 import Table, { TableProps } from "antd/lib/table";
 import Button from "antd/lib/button";
 import Spin from "antd/lib/spin";
+import InputNumber from "antd/lib/input-number";
 import AddItemForm from "../components/AddItemForm";
 import Input from "antd/lib/input";
-import tableApiMethods from "../utils/tableApi";
+import tableApiMethods from "../api/tableApi";
 
-const pantryTableUtils = tableApiMethods("pantry");
+const pantryTableMethods = tableApiMethods("pantry");
 
 type ItemRow = {
     itemId: number;
@@ -58,7 +59,19 @@ class Pantry extends React.Component<{}, State> {
             {
                 title: "Stock",
                 dataIndex: "pantryCount",
-                key: "pantryCount"
+                key: "pantryCount",
+                render: (text: string, entry: ItemRow) => {
+                    return (
+                        <InputNumber
+                            size="small"
+                            value={entry.pantryCount}
+                            onChange={this.handleStockChange(
+                                entry.itemId,
+                                entry
+                            )}
+                        />
+                    );
+                }
             },
             {
                 title: "Recipes",
@@ -82,7 +95,7 @@ class Pantry extends React.Component<{}, State> {
     }
 
     public async componentDidMount() {
-        const tableData = await pantryTableUtils.fetchTableData();
+        const tableData = await pantryTableMethods.fetchTableData();
         this.setState({
             loading: false,
             tableData
@@ -90,12 +103,28 @@ class Pantry extends React.Component<{}, State> {
     }
 
     public handleDeleteClick = (entry: ItemRow) => async () => {
-        await pantryTableUtils.deleteTableEntry(entry)();
-        const tableData = await pantryTableUtils.fetchTableData();
+        await pantryTableMethods.deleteTableEntry(entry)();
+        const tableData = await pantryTableMethods.fetchTableData();
 
         this.setState({
             tableData
         });
+    };
+
+    public handleStockChange = (entryId: number, entry: ItemRow) => async (
+        value: number | undefined
+    ) => {
+        if (value) {
+            await pantryTableMethods.updateTableEntry(entryId, {
+                ...entry,
+                pantryCount: value
+            })();
+            const tableData = await pantryTableMethods.fetchTableData();
+
+            this.setState({
+                tableData
+            });
+        }
     };
 
     public handleAddItemClick = () => {
@@ -128,9 +157,9 @@ class Pantry extends React.Component<{}, State> {
                         pantryCount: newPantryItemFromForm.count
                     };
 
-                    await pantryTableUtils.createTableEntry(newPantryItem);
+                    await pantryTableMethods.createTableEntry(newPantryItem);
 
-                    const tableData = await pantryTableUtils.fetchTableData();
+                    const tableData = await pantryTableMethods.fetchTableData();
 
                     form.resetFields();
 

@@ -12,7 +12,23 @@ interface Props extends FormComponentProps {
     onAddItem: () => void;
 }
 
-class AddItemForm extends React.Component<Props> {
+interface State {
+    sizeDisabled: boolean;
+}
+
+class AddItemForm extends React.Component<Props, State> {
+    state = {
+        sizeDisabled: false
+    };
+
+    public checkNoUnitSelect = (option: string) => {
+        if (option === "-") {
+            this.setState({
+                sizeDisabled: true
+            });
+        }
+    };
+
     render() {
         const { visible, onCancel, onAddItem, form } = this.props;
         const { getFieldDecorator } = form;
@@ -35,17 +51,6 @@ class AddItemForm extends React.Component<Props> {
                             ]
                         })(<Input />)}
                     </Form.Item>
-                    <Form.Item label="Size">
-                        {getFieldDecorator("size", {
-                            rules: [
-                                {
-                                    required: true,
-                                    message:
-                                        "Please input the size (fraction, weight or volume) of the item"
-                                }
-                            ]
-                        })(<InputNumber min={0} />)}
-                    </Form.Item>
 
                     <Form.Item label="Units">
                         {getFieldDecorator("unit", {
@@ -56,15 +61,32 @@ class AddItemForm extends React.Component<Props> {
                                 }
                             ]
                         })(
-                            <Select>
+                            <Select onChange={this.checkNoUnitSelect}>
                                 <Select.Option value="g">g</Select.Option>
                                 <Select.Option value="kg">kg</Select.Option>
                                 <Select.Option value="ml">ml</Select.Option>
                                 <Select.Option value="L">L</Select.Option>
-                                <Select.Option value="-">-</Select.Option>
+                                <Select.Option value="-">None</Select.Option>
                             </Select>
                         )}
                     </Form.Item>
+                    <Form.Item label="Size">
+                        {getFieldDecorator("size", {
+                            rules: [
+                                {
+                                    required: true,
+                                    message:
+                                        "Please input the size (fraction, weight or volume) of the item"
+                                }
+                            ]
+                        })(
+                            <InputNumber
+                                min={0}
+                                disabled={this.state.sizeDisabled}
+                            />
+                        )}
+                    </Form.Item>
+
                     <Form.Item label="Count">
                         {getFieldDecorator("count", {
                             rules: [
