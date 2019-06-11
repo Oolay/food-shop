@@ -28,6 +28,7 @@ interface State {
     tableData: ItemRow[];
     loading: boolean;
     formVisible: boolean;
+    sizeDisabled: boolean;
 }
 
 class Pantry extends React.Component<{}, State> {
@@ -38,7 +39,8 @@ class Pantry extends React.Component<{}, State> {
         this.state = {
             tableData: [],
             loading: true,
-            formVisible: false
+            formVisible: false,
+            sizeDisabled: false
         };
         this.columns = [
             {
@@ -135,8 +137,21 @@ class Pantry extends React.Component<{}, State> {
 
     public handleFormCancel = () => {
         this.setState({
-            formVisible: false
+            formVisible: false,
+            sizeDisabled: false
         });
+    };
+
+    public checkNoUnitSelect = (option: string) => {
+        if (option === "-") {
+            this.setState({
+                sizeDisabled: true
+            });
+        } else {
+            this.setState({
+                sizeDisabled: false
+            });
+        }
     };
 
     public handleFormAddItem = async () => {
@@ -165,6 +180,7 @@ class Pantry extends React.Component<{}, State> {
 
                     this.setState({
                         loading: false,
+                        sizeDisabled: false,
                         formVisible: false,
                         tableData
                     });
@@ -202,6 +218,8 @@ class Pantry extends React.Component<{}, State> {
                     onCancel={this.handleFormCancel}
                     onAddItem={this.handleFormAddItem}
                     wrappedComponentRef={this.saveFormRef}
+                    checkNoUnitSelect={this.checkNoUnitSelect}
+                    sizeDisabled={this.state.sizeDisabled}
                 />
             </React.Fragment>
         );

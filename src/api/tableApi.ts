@@ -42,6 +42,19 @@ const createTableEntry = (view: View) => async (entry: TableEntry) => {
     });
 };
 
+const checkTableEntryExists = (view: View) => async (
+    entryId: number,
+    entry: TableEntry
+) => {
+    await fetch(`${getApiUrl(view)}/${entryId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(entry)
+    });
+};
+
 const deleteTableEntry = (view: View) => (entry: TableEntry) => async () => {
     await fetch(getApiUrl(view), {
         method: "DELETE",

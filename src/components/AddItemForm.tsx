@@ -7,30 +7,23 @@ import Select from "antd/lib/select";
 
 interface Props extends FormComponentProps {
     visible: boolean;
+    sizeDisabled: boolean;
     onCancel: () => void;
     wrappedComponentRef: (name: Input | null) => void;
     onAddItem: () => void;
+    checkNoUnitSelect: (option: string) => void;
 }
 
-interface State {
-    sizeDisabled: boolean;
-}
-
-class AddItemForm extends React.Component<Props, State> {
-    state = {
-        sizeDisabled: false
-    };
-
-    public checkNoUnitSelect = (option: string) => {
-        if (option === "-") {
-            this.setState({
-                sizeDisabled: true
-            });
-        }
-    };
-
+class AddItemForm extends React.Component<Props> {
     render() {
-        const { visible, onCancel, onAddItem, form } = this.props;
+        const {
+            visible,
+            onCancel,
+            onAddItem,
+            form,
+            checkNoUnitSelect,
+            sizeDisabled
+        } = this.props;
         const { getFieldDecorator } = form;
         return (
             <Modal
@@ -61,7 +54,7 @@ class AddItemForm extends React.Component<Props, State> {
                                 }
                             ]
                         })(
-                            <Select onChange={this.checkNoUnitSelect}>
+                            <Select onChange={checkNoUnitSelect}>
                                 <Select.Option value="g">g</Select.Option>
                                 <Select.Option value="kg">kg</Select.Option>
                                 <Select.Option value="ml">ml</Select.Option>
@@ -74,17 +67,12 @@ class AddItemForm extends React.Component<Props, State> {
                         {getFieldDecorator("size", {
                             rules: [
                                 {
-                                    required: true,
+                                    required: !sizeDisabled,
                                     message:
                                         "Please input the size (fraction, weight or volume) of the item"
                                 }
                             ]
-                        })(
-                            <InputNumber
-                                min={0}
-                                disabled={this.state.sizeDisabled}
-                            />
-                        )}
+                        })(<InputNumber min={0} disabled={sizeDisabled} />)}
                     </Form.Item>
 
                     <Form.Item label="Count">
