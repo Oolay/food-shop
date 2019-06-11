@@ -52,10 +52,24 @@ const deleteTableEntry = (view: View) => (entry: TableEntry) => async () => {
     });
 };
 
+const updateTableEntry = (view: View) => (
+    entryId: number,
+    entry: TableEntry
+) => async () => {
+    await fetch(`${getApiUrl(view)}/${entryId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(entry)
+    });
+};
+
 const tableApiMethods = (view: View) => ({
     fetchTableData: fetchTableData(view),
     createTableEntry: createTableEntry(view),
-    deleteTableEntry: deleteTableEntry(view)
+    deleteTableEntry: deleteTableEntry(view),
+    updateTableEntry: updateTableEntry(view)
 });
 
 export default tableApiMethods;
