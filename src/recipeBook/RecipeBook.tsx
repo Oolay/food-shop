@@ -2,15 +2,16 @@ import React from "react";
 import Table, { TableProps } from "antd/lib/table";
 import Button from "antd/lib/button";
 import Spin from "antd/lib/spin";
+import tableApiMethods from "../api/tableApi";
+
+const recipeBookTableMethods = tableApiMethods("recipeBook");
 
 type Recipe = {
     id: number;
-    name: string;
-    serves: number;
+    recipeName: string;
+    recipeServes: number;
     ingredients: number[];
 };
-
-const recipeDataURL = "http://localhost:3000/recipes";
 
 interface State {
     tableData: Recipe[];
@@ -29,31 +30,23 @@ class RecipeBook extends React.Component<{}, State> {
         this.columns = [
             {
                 title: "Name",
-                dataIndex: "name",
-                key: "name"
+                dataIndex: "recipeName",
+                key: "recipeName"
             },
             {
                 title: "Serves",
-                dataIndex: "serves",
-                key: "serves"
+                dataIndex: "recipeServes",
+                key: "recipeServes"
             },
             {
                 title: "Ingredients",
-                dataIndex: "ingredients",
-                key: "ingredients",
+                dataIndex: "recipeIngredients",
+                key: "recipeIngredients",
                 render: (text: string, record: Recipe) => {
-                    return <Button>{`${record.name}'s  ingredients`}</Button>;
+                    return (
+                        <Button>{`${record.recipeName}'s  ingredients`}</Button>
+                    );
                 }
-            },
-            {
-                title: "Cost",
-                dataIndex: "cost",
-                key: "cost"
-            },
-            {
-                title: "Savings",
-                dataIndex: "savings",
-                key: "savings"
             },
             {
                 title: "Action",
@@ -63,18 +56,8 @@ class RecipeBook extends React.Component<{}, State> {
         ];
     }
 
-    public fetchTableData = async (url: string) => {
-        const recipeDataResponse = await fetch(url);
-        const recipeData = await recipeDataResponse.json();
-        const tableData = recipeData.map((recipe: Recipe) => {
-            return { ...recipe, key: recipe.id };
-        });
-
-        return tableData;
-    };
-
     public async componentDidMount() {
-        const tableData = await this.fetchTableData(recipeDataURL);
+        const tableData = await recipeBookTableMethods.fetchTableData();
 
         this.setState({
             tableData,
