@@ -3,7 +3,7 @@ import apiDomainName from "../apiDomainName";
 type View = "shoppingList" | "recipeBook" | "pantry";
 
 type ItemRow = {
-    itemId: number;
+    primeId: number;
     itemName: string;
     itemSize: number;
     itemUnit: string;
@@ -27,7 +27,7 @@ const fetchTableData = (view: View) => async () => {
     const dataResponse = await fetch(getApiUrl(view));
     const data = await dataResponse.json();
     const tableData = data.map((row: DbRow) => {
-        return { ...row, key: row.itemId };
+        return { ...row, key: row.primeId };
     });
     return tableData;
 };

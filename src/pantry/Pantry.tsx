@@ -10,7 +10,7 @@ import tableApiMethods from "../api/tableApi";
 const pantryTableMethods = tableApiMethods("pantry");
 
 type ItemRow = {
-    itemId: number;
+    primeId: number;
     itemName: string;
     itemSize: number;
     itemUnit: string;
@@ -68,12 +68,17 @@ class Pantry extends React.Component<{}, State> {
                             size="small"
                             value={entry.pantryCount}
                             onChange={this.handleStockChange(
-                                entry.itemId,
+                                entry.primeId,
                                 entry
                             )}
                         />
                     );
                 }
+            },
+            {
+                title: "Total quantity",
+                dataIndex: "totalQuantity",
+                key: "totalQuantity"
             },
             {
                 title: "Recipes",
