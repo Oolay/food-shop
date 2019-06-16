@@ -76,11 +76,6 @@ class Pantry extends React.Component<{}, State> {
                 }
             },
             {
-                title: "Total quantity",
-                dataIndex: "totalQuantity",
-                key: "totalQuantity"
-            },
-            {
                 title: "Recipes",
                 dataIndex: "recipes",
                 key: "recipes",

@@ -2,35 +2,58 @@ import React, { useState } from "react";
 
 type Callback = () => void;
 
-const useAddRecipeForm = (callback: Callback) => {
+const useForm = (onOkcallback: Callback, onCancelCallback: Callback) => {
     const [inputs, setInputs]: [any, any] = useState({});
     const [formVisible, setFormVisible] = useState(false);
 
     const handleShowForm = () => {
-        setFormVisible(true);
+        setFormVisible(!formVisible);
     };
 
     const handleFormCancel = (event: React.MouseEvent) => {
         if (event) {
             event.preventDefault();
         }
+        onCancelCallback();
         setFormVisible(false);
+        setInputs({});
     };
 
     const handleFormOk = (event: React.MouseEvent) => {
         if (event) {
             event.preventDefault();
         }
-        callback();
+        onOkcallback();
         setFormVisible(false);
+        setInputs({});
+    };
+
+    const handleInputNumberChange = (fieldName: string) => {
+        return (value: number | undefined) => {
+            if (value) {
+                setInputs({
+                    ...inputs,
+                    [fieldName]: value
+                });
+            }
+        };
+    };
+
+    const handleSelectChange = (fieldName: string) => {
+        return (value: string) => {
+            setInputs({
+                ...inputs,
+                [fieldName]: value
+            });
+        };
     };
 
     const handleInputChange = (event: any) => {
-        event.persist();
-        setInputs((inputs: any) => ({
+        const eventPersist = event;
+        setInputs({
             ...inputs,
-            [event.target.name]: event.target.value
-        }));
+            [eventPersist.target.name]: eventPersist.target.value
+        });
     };
 
     return {
@@ -38,9 +61,11 @@ const useAddRecipeForm = (callback: Callback) => {
         handleFormCancel,
         handleFormOk,
         handleInputChange,
+        handleInputNumberChange,
+        handleSelectChange,
         inputs,
         formVisible
     };
 };
 
-export default useAddRecipeForm;
+export default useForm;

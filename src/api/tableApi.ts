@@ -19,7 +19,12 @@ type PantryEntry = {
     pantryCount: number;
 };
 
-type TableEntry = PantryEntry;
+type RecipeEntry = {
+    recipeName: string;
+    serves: number;
+};
+
+type TableEntry = PantryEntry | RecipeEntry;
 
 const getApiUrl = (view: View) => `${apiDomainName}/${view}`;
 

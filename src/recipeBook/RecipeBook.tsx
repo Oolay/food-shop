@@ -73,7 +73,9 @@ const RecipeBook = (props: {}) => {
 
     return (
         <React.Fragment>
-            <AddRecipeForm />
+            <AddRecipeForm
+                formInputCallback={recipeBookTableMethods.createTableEntry}
+            />
             {getTableDisplay()}
         </React.Fragment>
     );
