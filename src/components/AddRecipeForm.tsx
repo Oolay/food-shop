@@ -16,17 +16,28 @@ type Inputs = {
 
 type Props = {
     formInputCallback: (inputs: Inputs) => void;
+    fetchRecipeTableData: () => void;
 };
 
 const AddRecipeForm = (props: Props) => {
     const [ingredientNumber, setIngredientNumber] = useState(1);
+    const [disabledUnitSelector, setDisabledUnitSelector] = useState([false]);
 
     const recipeFormOkCallback = () => {
         props.formInputCallback({ ...inputs, ingredientNumber });
+        props.fetchRecipeTableData();
         setIngredientNumber(1);
+        setDisabledUnitSelector([false]);
     };
     const recipeFormCancelCallback = () => {
         setIngredientNumber(1);
+        setDisabledUnitSelector([false]);
+    };
+
+    const onUnitSelectCallback = (value: string, ingredientId: number) => {
+        const newDisabledUnitSelector = disabledUnitSelector;
+        newDisabledUnitSelector[ingredientId] = value === "-" ? true : false;
+        setDisabledUnitSelector(newDisabledUnitSelector);
     };
 
     const {
@@ -35,7 +46,7 @@ const AddRecipeForm = (props: Props) => {
         handleFormOk,
         handleInputChange,
         handleInputNumberChange,
-        handleSelectChange,
+        handleIngredientUnitSelectChange,
         inputs,
         formVisible
     }: {
@@ -46,10 +57,17 @@ const AddRecipeForm = (props: Props) => {
         handleInputNumberChange: (
             fieldName: string
         ) => (value: number | undefined) => void;
-        handleSelectChange: (fieldName: string) => (value: string) => void;
+        handleIngredientUnitSelectChange: (
+            fieldName: string,
+            ingredientId: number
+        ) => (value: string) => void;
         inputs: any;
         formVisible: boolean;
-    } = useForm(recipeFormOkCallback, recipeFormCancelCallback);
+    } = useForm(
+        recipeFormOkCallback,
+        recipeFormCancelCallback,
+        onUnitSelectCallback
+    );
 
     const getIngredientInputs = (ingredientNumber: number) => {
         let ingredientForms = [];
@@ -64,6 +82,21 @@ const AddRecipeForm = (props: Props) => {
                             name={`ingredientName${i}`}
                             value={inputs[`ingredientName${i}`]}
                         />
+                        <Select
+                            placeholder={"Unit"}
+                            onChange={handleIngredientUnitSelectChange(
+                                `ingredientUnit${i}`,
+                                i
+                            )}
+                            style={{ width: "20%" }}
+                            value={inputs[`ingredientUnit${i}`]}
+                        >
+                            <Select.Option value="g">g</Select.Option>
+                            <Select.Option value="kg">kg</Select.Option>
+                            <Select.Option value="ml">ml</Select.Option>
+                            <Select.Option value="L">L</Select.Option>
+                            <Select.Option value="-">None</Select.Option>
+                        </Select>
                         <InputNumber
                             placeholder={"Size"}
                             style={{ width: "20%" }}
@@ -73,6 +106,7 @@ const AddRecipeForm = (props: Props) => {
                             )}
                             name={`ingredientSize${i}`}
                             value={inputs[`ingredientSize${i}`]}
+                            disabled={disabledUnitSelector[i]}
                         />
                         <InputNumber
                             placeholder={"Quantity"}
@@ -84,18 +118,6 @@ const AddRecipeForm = (props: Props) => {
                             name={`ingredientQuantity${i}`}
                             value={inputs[`ingredientQuantity${i}`]}
                         />
-                        <Select
-                            placeholder={"Unit"}
-                            onChange={handleSelectChange(`ingredientUnit${i}`)}
-                            style={{ width: "20%" }}
-                            value={inputs[`ingredientUnit${i}`]}
-                        >
-                            <Select.Option value="g">g</Select.Option>
-                            <Select.Option value="kg">kg</Select.Option>
-                            <Select.Option value="ml">ml</Select.Option>
-                            <Select.Option value="L">L</Select.Option>
-                            <Select.Option value="-">None</Select.Option>
-                        </Select>
                     </Input.Group>
                 </Form.Item>
             );
@@ -105,10 +127,16 @@ const AddRecipeForm = (props: Props) => {
 
     const incrementIngredientNumber = () => {
         setIngredientNumber(ingredientNumber + 1);
+        const newDisabledUnitSelector = disabledUnitSelector;
+        newDisabledUnitSelector.push(false);
+        setDisabledUnitSelector(newDisabledUnitSelector);
     };
 
     const decrementIngredientNumber = () => {
         setIngredientNumber(ingredientNumber - 1);
+        const newDisabledUnitSelector = disabledUnitSelector;
+        newDisabledUnitSelector.pop();
+        setDisabledUnitSelector(newDisabledUnitSelector);
     };
 
     return (

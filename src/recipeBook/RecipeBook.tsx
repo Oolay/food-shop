@@ -22,16 +22,16 @@ interface State {
 const RecipeBook = (props: {}) => {
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [formVisible, setFormVisible] = useState(false);
 
-    useEffect(() => {
+    const fetchRecipeTableData = () => {
         const fetchData = async () => {
             const tableData = await recipeBookTableMethods.fetchTableData();
             setTableData(tableData);
             setLoading(false);
         };
         fetchData();
-    }, []);
+    };
+    useEffect(fetchRecipeTableData, []);
 
     const columns: TableProps<Recipe>["columns"] = [
         {
@@ -75,6 +75,7 @@ const RecipeBook = (props: {}) => {
         <React.Fragment>
             <AddRecipeForm
                 formInputCallback={recipeBookTableMethods.createTableEntry}
+                fetchRecipeTableData={fetchRecipeTableData}
             />
             {getTableDisplay()}
         </React.Fragment>

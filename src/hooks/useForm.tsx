@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 
 type Callback = () => void;
+type OnUnitSelectCallback = (value: string, ingredientId: number) => void;
 
-const useForm = (onOkcallback: Callback, onCancelCallback: Callback) => {
+const useForm = (
+    onOkcallback: Callback,
+    onCancelCallback: Callback,
+    onUnitSelectCallback: OnUnitSelectCallback
+) => {
     const [inputs, setInputs]: [any, any] = useState({});
     const [formVisible, setFormVisible] = useState(false);
 
@@ -39,8 +44,12 @@ const useForm = (onOkcallback: Callback, onCancelCallback: Callback) => {
         };
     };
 
-    const handleSelectChange = (fieldName: string) => {
+    const handleIngredientUnitSelectChange = (
+        fieldName: string,
+        ingredientId: number
+    ) => {
         return (value: string) => {
+            onUnitSelectCallback(value, ingredientId);
             setInputs({
                 ...inputs,
                 [fieldName]: value
@@ -62,7 +71,7 @@ const useForm = (onOkcallback: Callback, onCancelCallback: Callback) => {
         handleFormOk,
         handleInputChange,
         handleInputNumberChange,
-        handleSelectChange,
+        handleIngredientUnitSelectChange,
         inputs,
         formVisible
     };
