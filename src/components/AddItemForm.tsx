@@ -63,7 +63,7 @@ class AddItemForm extends React.Component<Props> {
                             </Select>
                         )}
                     </Form.Item>
-                    <Form.Item label="Size">
+                    <Form.Item label="Quantity">
                         {getFieldDecorator("size", {
                             rules: [
                                 {

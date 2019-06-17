@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Table, { TableProps } from "antd/lib/table";
 import Button from "antd/lib/button";
 import Spin from "antd/lib/spin";
 import tableApiMethods from "../api/tableApi";
+import AddRecipeForm from "../components/AddRecipeForm";
 
 const recipeBookTableMethods = tableApiMethods("recipeBook");
 
@@ -18,78 +19,67 @@ interface State {
     loading: boolean;
 }
 
-class RecipeBook extends React.Component<{}, State> {
-    private columns: TableProps<Recipe>["columns"];
-    constructor(props: {}) {
-        super(props);
-        this.state = {
-            tableData: [],
-            loading: true
+const RecipeBook = (props: {}) => {
+    const [tableData, setTableData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchRecipeTableData = () => {
+        const fetchData = async () => {
+            const tableData = await recipeBookTableMethods.fetchTableData();
+            setTableData(tableData);
+            setLoading(false);
         };
+        fetchData();
+    };
+    useEffect(fetchRecipeTableData, []);
 
-        this.columns = [
-            {
-                title: "Name",
-                dataIndex: "recipeName",
-                key: "recipeName"
-            },
-            {
-                title: "Serves",
-                dataIndex: "recipeServes",
-                key: "recipeServes"
-            },
-            {
-                title: "Ingredients",
-                dataIndex: "recipeIngredients",
-                key: "recipeIngredients",
-                render: (text: string, record: Recipe) => {
-                    return (
-                        <Button>{`${record.recipeName}'s  ingredients`}</Button>
-                    );
-                }
-            },
-            {
-                title: "Action",
-                dataIndex: "action",
-                key: "action"
+    const columns: TableProps<Recipe>["columns"] = [
+        {
+            title: "Name",
+            dataIndex: "recipeName",
+            key: "recipeName"
+        },
+        {
+            title: "Serves",
+            dataIndex: "recipeServes",
+            key: "recipeServes"
+        },
+        {
+            title: "Ingredients",
+            dataIndex: "recipeIngredients",
+            key: "recipeIngredients",
+            render: (text: string, record: Recipe) => {
+                return <Button>{`${record.recipeName}'s  ingredients`}</Button>;
             }
-        ];
-    }
+        },
+        {
+            title: "Action",
+            dataIndex: "action",
+            key: "action"
+        }
+    ];
 
-    public async componentDidMount() {
-        const tableData = await recipeBookTableMethods.fetchTableData();
-
-        this.setState({
-            tableData,
-            loading: false
-        });
-    }
-
-    public getTableDisplay = () => {
-        if (!this.state.loading) {
+    const getTableDisplay = () => {
+        if (!loading) {
             return (
-                <Table
-                    columns={this.columns}
-                    dataSource={this.state.tableData}
-                />
+                <React.Fragment>
+                    <Table columns={columns} dataSource={tableData} />
+                </React.Fragment>
             );
         }
 
         return <Spin size="large" />;
     };
 
-    public handleViewIngredientsClick = () => {
-        console.log("ello");
-    };
-
-    render() {
-        return (
-            <React.Fragment>
-                <Button>Add recipe</Button>
-                {this.getTableDisplay()}
-            </React.Fragment>
-        );
-    }
-}
+    return (
+        <React.Fragment>
+            <AddRecipeForm
+                formInputCallback={recipeBookTableMethods.createTableEntry}
+                fetchRecipeTableData={fetchRecipeTableData}
+            />
+            {getTableDisplay()}
+        </React.Fragment>
+    );
+};
 
 export default RecipeBook;
