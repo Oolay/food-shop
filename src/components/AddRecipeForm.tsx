@@ -8,14 +8,10 @@ import Select from "antd/lib/select";
 import Icon from "antd/lib/icon";
 
 import useForm from "../hooks/useForm";
-
-type Inputs = {
-    recipeName: string;
-    serves: number;
-};
+import { NewRecipeEntry } from "../api/tableApi";
 
 type Props = {
-    formInputCallback: (inputs: Inputs) => void;
+    formInputCallback: (inputs: NewRecipeEntry) => void;
     fetchRecipeTableData: () => void;
 };
 

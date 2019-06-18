@@ -2,26 +2,40 @@ import React, { useState, useEffect } from "react";
 import Table, { TableProps } from "antd/lib/table";
 import Button from "antd/lib/button";
 import Spin from "antd/lib/spin";
-import tableApiMethods from "../api/tableApi";
+import tableApiMethods, {
+    ExistingTableEntry,
+    ExistingRecipeEntry
+} from "../api/tableApi";
 import AddRecipeForm from "../components/AddRecipeForm";
+import RecipeIngredientView from "../components/RecipeIngredientView";
+import useEntryDetaillModal from "../hooks/useEntryDetailModal";
 
 const recipeBookTableMethods = tableApiMethods("recipeBook");
 
-type Recipe = {
-    id: number;
+export type Recipe = {
+    primeId: number;
     recipeName: string;
-    recipeServes: number;
-    ingredients: number[];
+    serves: number;
 };
-
-interface State {
-    tableData: Recipe[];
-    loading: boolean;
-}
 
 const RecipeBook = (props: {}) => {
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const getRecipeIngredientDisplay = (
+        entry: ExistingTableEntry
+    ) => async () => {
+        const recipeIngredients = await recipeBookTableMethods.viewEntryDetails(
+            entry.primeId
+        );
+    };
+
+    const {
+        modalVisible,
+        onShowModal,
+        onCancel,
+        modalTableData
+    } = useEntryDetaillModal(getRecipeIngredientDisplay);
 
     const fetchRecipeTableData = () => {
         const fetchData = async () => {
@@ -48,8 +62,12 @@ const RecipeBook = (props: {}) => {
             title: "Ingredients",
             dataIndex: "recipeIngredients",
             key: "recipeIngredients",
-            render: (text: string, record: Recipe) => {
-                return <Button>{`${record.recipeName}'s  ingredients`}</Button>;
+            render: (text: string, entry: ExistingRecipeEntry) => {
+                return (
+                    <Button onClick={onShowModal(entry)}>{`${
+                        entry.recipeName
+                    }'s  ingredients`}</Button>
+                );
             }
         },
         {
@@ -73,6 +91,12 @@ const RecipeBook = (props: {}) => {
 
     return (
         <React.Fragment>
+            <RecipeIngredientView
+                visible={modalVisible}
+                onCancel={onCancel}
+                tableData={modalTableData}
+            />
+            ;
             <AddRecipeForm
                 formInputCallback={recipeBookTableMethods.createTableEntry}
                 fetchRecipeTableData={fetchRecipeTableData}

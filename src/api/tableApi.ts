@@ -2,7 +2,7 @@ import apiDomainName from "../apiDomainName";
 
 type View = "shoppingList" | "recipeBook" | "pantry";
 
-type ItemRow = {
+export type ExistingPantryEntry = {
     primeId: number;
     itemName: string;
     itemSize: number;
@@ -10,34 +10,42 @@ type ItemRow = {
     pantryCount: number;
 };
 
-type DbRow = ItemRow;
-
-type PantryEntry = {
+export type NewPantryEntry = {
     itemName: string;
     itemSize: number;
     itemUnit: string;
     pantryCount: number;
 };
 
-type RecipeEntry = {
+export type NewRecipeEntry = {
     recipeName: string;
     serves: number;
 };
 
-type TableEntry = PantryEntry | RecipeEntry;
+export type ExistingRecipeEntry = {
+    primeId: number;
+    recipeName: string;
+    serves: number;
+};
+
+export type ExistingTableEntry = ExistingPantryEntry | ExistingRecipeEntry;
+
+export type NewTableEntry = NewPantryEntry | NewRecipeEntry;
 
 const getApiUrl = (view: View) => `${apiDomainName}/${view}`;
 
 const fetchTableData = (view: View) => async () => {
     const dataResponse = await fetch(getApiUrl(view));
     const data = await dataResponse.json();
-    const tableData = data.map((row: DbRow) => {
-        return { ...row, key: row.primeId };
-    });
+    const tableData = data.map(
+        (row: ExistingPantryEntry | ExistingRecipeEntry) => {
+            return { ...row, key: row.primeId };
+        }
+    );
     return tableData;
 };
 
-const createTableEntry = (view: View) => async (entry: TableEntry) => {
+const createTableEntry = (view: View) => async (entry: NewTableEntry) => {
     await fetch(getApiUrl(view), {
         method: "POST",
         headers: {
@@ -47,7 +55,9 @@ const createTableEntry = (view: View) => async (entry: TableEntry) => {
     });
 };
 
-const deleteTableEntry = (view: View) => (entry: TableEntry) => async () => {
+const deleteTableEntry = (view: View) => (
+    entry: ExistingTableEntry
+) => async () => {
     await fetch(getApiUrl(view), {
         method: "DELETE",
         headers: {
@@ -59,7 +69,7 @@ const deleteTableEntry = (view: View) => (entry: TableEntry) => async () => {
 
 const updateTableEntry = (view: View) => (
     entryId: number,
-    entry: TableEntry
+    entry: ExistingTableEntry
 ) => async () => {
     await fetch(`${getApiUrl(view)}/${entryId}`, {
         method: "POST",
@@ -70,11 +80,30 @@ const updateTableEntry = (view: View) => (
     });
 };
 
+const viewEntryDetails = (view: View) => async (entryId: number) => {
+    const entryDataResponse = await fetch(`${getApiUrl(view)}/${entryId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+    const entryData = await entryDataResponse.json();
+    const entryDataTable = entryData.map(
+        (row: ExistingPantryEntry | ExistingRecipeEntry) => {
+            return { ...row, key: row.primeId };
+        }
+    );
+    console.log(entryDataTable);
+
+    return entryDataTable;
+};
+
 const tableApiMethods = (view: View) => ({
     fetchTableData: fetchTableData(view),
     createTableEntry: createTableEntry(view),
     deleteTableEntry: deleteTableEntry(view),
-    updateTableEntry: updateTableEntry(view)
+    updateTableEntry: updateTableEntry(view),
+    viewEntryDetails: viewEntryDetails(view)
 });
 
 export default tableApiMethods;
